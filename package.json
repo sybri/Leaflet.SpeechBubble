@@ -3,16 +3,19 @@
   "version": "1.0.0",
   "description": "Speech Bubble to get direction.",
   "main": "src/L.SpeechBubble.js",
-  "author": "Sylvain BRISSY",
+  "author": {
+    "name": "Sylvain BRISSY",
+    "email": "s.brissy@autoroutes-trafic.fr"
+  },
   "license": "IST",
   "peerDependencies": {
     "leaflet": "^1.0.0"
   },
-   "directories": {
+  "directories": {
     "example": "examples",
     "dist": "dist"
   },
-   "repository": {
+  "repository": {
     "type": "git",
     "url": "https://github.com/sybri/Leaflet.SpeechBubble.git"
   },
@@ -20,8 +23,8 @@
     "leaflet",
     "SpeechBubble"
   ],
-  "author": {
-    "name": "Sylvain BRISYS",
-    "email": "s.brissy@autoroutes-trafic.fr"
-  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-uglify": "^3.0.0"
+  }
 }
