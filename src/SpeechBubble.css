@@ -1,0 +1,30 @@
+
+.leaflet-speechbubble ,
+.leaflet-speechbubble .leaflet-speechbubble-content{
+	position: absolute;
+}
+.leaflet-speechbubble {
+	
+	color:#000;
+	padding:0px;
+	position:absolute;
+	
+	
+	
+}
+.leaflet-speechbubble .leaflet-speechbubble-content{
+	padding: 10px;
+	
+}
+.leaflet-speechbubble .leaflet-speechbubble-curs{
+	height: 0;
+	width: 0;
+	
+	position: absolute;
+}
+.leaflet-speechbubble .leaflet-speechbubble-curs .leaflet-speechbubble-arrow {
+	width:0; 
+	height:0;
+	
+	position:absolute;
+}
