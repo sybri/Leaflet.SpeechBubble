@@ -216,7 +216,7 @@ L.SpeechBubble = L.DivOverlay.extend({
 		map.on("zoom ",function() { 
 			this.speechbubble.update(); 
 		});
-		//this.speechbubble.update();
+		this.speechbubble.update();
 		
 	},
 	addTo: function (map) {
