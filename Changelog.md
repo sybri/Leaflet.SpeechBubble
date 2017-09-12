@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
  - beter management of hide show when the layer is outside the map viewport maybe a replacement by popup?
+ - fixed layer management.
+ - Add AutoPlacement.
+ - Change the extending of divOverlay
 
 ## [1.0.1]
  - Fix bugs

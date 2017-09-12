@@ -4,195 +4,315 @@
 
     // define an AMD module that relies on 'leaflet'
     if (typeof define === 'function' && define.amd) {
-        define(['leaflet'], factory);
+    	define(['leaflet'], factory);
 
     // define a Common JS module that relies on 'leaflet'
-    } else if (typeof exports === 'object') {
-        module.exports = factory(require('leaflet'));
-    }
+} else if (typeof exports === 'object') {
+	module.exports = factory(require('leaflet'));
+}
 
     // attach your plugin to the global 'L' variable
     if (typeof window !== 'undefined' && window.L) {
-        window.L.YourPlugin = factory(L);
+    	window.L.YourPlugin = factory(L);
     }
 }(function (L) {
 
-L.speechBubble = function(options,latlng) {
-	if(options) {
-		return new L.SpeechBubble(options,latlng);
-	} else {
-		return new L.SpeechBubble(null,latlng);
-	}
-};
-L.SpeechBubble = L.DivOverlay.extend({
-	includes: L.Mixin.Events,
-	options:{
-		width: null,
-		height: null,
-		top: null,
-		left: null,
-		strenth: 200,
-		base: 30,
-		angle:0,
-		background: "#FFF",
-		borderThick: 2,
-		borderColor: "#000",
-		borderRadius: 10
-	},
-	_toLatLng:function(a, b, c) {
-		if (a instanceof L.LatLng) {
-			return a;
-		}
-		if (L.Util.isArray(a) && typeof a[0] !== 'object') {
-			if (a.length === 3) {
-				return new L.LatLng(a[0], a[1], a[2]);
-			}
-			if (a.length === 2) {
-				return new L.LatLng(a[0], a[1]);
-			}
-			return null;
-		}
-		if (a === undefined || a === null) {
-			return a;
-		}
-		if (typeof a === 'object' && 'lat' in a) {
-			return new L.LatLng(a.lat, 'lng' in a ? a.lng : a.lon, a.alt);
-		}
-		if (typeof a === 'object' && 'getLatLng' in a) {
-			return a.getLatLng();
-		}
-		if (b === undefined) {
-			return null;
-		}
-		return new L.LatLng(a, b, c);
-	},
-	initialize: function (options,source) {
+	L.speechBubble = function(options,latlng) {
 		if(options) {
-			L.setOptions(this, options);
+			return new L.SpeechBubble(options,latlng);
+		} else {
+			return new L.SpeechBubble(null,latlng);
 		}
-		this._source = source;
-		this.turn=0;
-		this._div = L.DomUtil.create('div','leaflet-speechbubble',this._container);
-		this._curs = L.DomUtil.create('div','leaflet-speechbubble-curs',this._div);
-		this._arrow = L.DomUtil.create('div','leaflet-speechbubble-arrow',this._curs);
-		this._arrow_back = L.DomUtil.create('div','leaflet-speechbubble-arrow-back',this._arrow);
-		this._divcontent = L.DomUtil.create('div','leaflet-speechbubble-content',this._div);
-		this._latlng = this._toLatLng(source);
-		
-	},
-	
+	};
+	L.SpeechBubble = L.DivOverlay.extend({
+		includes: L.Mixin.Events,
+		options:{
+			width: null,
+			height: null,
+			top: null,
+			left: null,
+			strenth: null,
+			base: null,
+			angle:0,
+			background: "#FFF",
+			borderThick: 2,
+			borderColor: "#000",
+			borderRadius: 10
+		},
+		_toLatLng:function(a, b, c) {
+			if (a instanceof L.LatLng) {
+				return a;
+			}
+			if (L.Util.isArray(a) && typeof a[0] !== 'object') {
+				if (a.length === 3) {
+					return new L.LatLng(a[0], a[1], a[2]);
+				}
+				if (a.length === 2) {
+					return new L.LatLng(a[0], a[1]);
+				}
+				return null;
+			}
+			if (a === undefined || a === null) {
+				return a;
+			}
+			if (typeof a === 'object' && 'lat' in a) {
+				return new L.LatLng(a.lat, 'lng' in a ? a.lng : a.lon, a.alt);
+			}
+			if (typeof a === 'object' && 'getLatLng' in a) {
+				return a.getLatLng();
+			}
+			if (b === undefined) {
+				return null;
+			}
+			return new L.LatLng(a, b, c);
+		},
+		initialize: function (options,source) {
+			if(options) {
+				L.setOptions(this, options);
+			}
+			this._source = source;
+			this.turn=0;
+			this._div = L.DomUtil.create('div','leaflet-speechbubble',this._container);
+			this._curs = L.DomUtil.create('div','leaflet-speechbubble-curs',this._div);
+			this._anchor = L.DomUtil.create('div','leaflet-speechbubble-anchor',this._container);
+			this._arrow = L.DomUtil.create('div','leaflet-speechbubble-arrow',this._curs);
+			this._arrow_back = L.DomUtil.create('div','leaflet-speechbubble-arrow-back',this._arrow);
+			this._divcontent = L.DomUtil.create('div','leaflet-speechbubble-content',this._div);
 
-	className: 'leaflet-speechbubble',
-	setClassName: function(newClassName) {
-		if(newClassName && typeof newClassName === 'string') {
-			this.className = newClassName;
-			this._div.className = this.className;
-		}
-	},
-	addClass: function(newClassName) {
-		if(newClassName && typeof newClassName === 'string') {
-			this._div.classList.add(newClassName);
+			this._latlng = this._toLatLng(source);
+			if(this.options.class){
+				this.setClassName(this.options.class);
+			}
+
+		},
+
+
+		className: 'leaflet-speechbubble',
+		setClassName: function(newClassName) {
+			if(newClassName && typeof newClassName === 'string') {
+				this.className = newClassName;
+				this._div.className = this.className;
+			}
+		},
+		addClass: function(newClassName) {
+			if(newClassName && typeof newClassName === 'string') {
+				this._div.classList.add(newClassName);
+
+			}
+		},
+		removeClass: function(classToRemove) {
+			if(classToRemove && typeof classToRemove === 'string' && this._div.classList.contains(classToRemove)) {
+				this._div.classList.remove(classToRemove);
+
+			}
+		},
+		_setDefaultDim: function(){
+			var center_x=this._container.clientWidth/2;
+			var center_y=this._container.clientHeight/2;
+			if(!this.options.height)
+			{
+				this.options.height=this._container.clientHeight*2/4; 
+			}
+			if(!this.options.width)
+			{
+				this.options.width=this._container.clientWidth*2/4; 
+			}
+			if(!this.options.strenth)
+			{
+				var deltaY=this._container.clientHeight-this.options.height
+				var deltaX=this._container.clientWidth-this.options.width
+				this.options.strenth=Math.min(deltaX,deltaY)/2;
+				this.options.base=this.options.strenth/20*3;
+			}
+
+
 			
-		}
-	},
-	removeClass: function(classToRemove) {
-		if(classToRemove && typeof classToRemove === 'string' && this._div.classList.contains(classToRemove)) {
-			this._div.classList.remove(classToRemove);
+			if(!this.options.top)
+			{
+				this.options.top=center_y-this.options.height/2;
+			}
+			if(!this.options.left)
+			{
+				this.options.left=center_x-this.options.width/2;
+			}
+
+		},
+		_update_autoplacement: function (){
+
+			var center=this._map.getCenter();
+			var dx=this._latlng.lng-center.lng;
+			var dy=this._latlng.lat-center.lat;
+			this.options.angle=Math.atan2(dy,dx) * 180.0 / Math.PI;
+			var rad=this._deg2rad(this.options.angle%360 );
+			var hypotenus_total=this._getLineLengthInRect(this.options.angle,this._container.clientWidth,this._container.clientHeight);
+			var border={
+				x:(Math.cos(-rad)*(hypotenus_total))+(this._container.clientWidth/2),
+				y:(Math.sin(-rad)*(hypotenus_total))+(this._container.clientHeight/2)
+				
+			}
+			var _anchor_arrow={
+				x: border.x-  (Math.cos(rad)*(this.options.strenth/2)) ,
+				y: border.y + (Math.sin(rad)*(this.options.strenth/2)) ,
+			};
+
+			var delta=this._getLineLengthInRect(this.options.angle,this.options.width,this.options.height);
 			
-		}
-	},
-	_setDefaultDim: function(){
-		var center_x=this._container.clientWidth/2;
-		var center_y=this._container.clientHeight/2;
-		if(!this.options.height)
-		{
-			this.options.height=this._container.clientHeight*2/4; 
-		}
-		if(!this.options.width)
-		{
-			this.options.width=this._container.clientWidth*2/4; 
-		}
-		if(!this.options.top)
-		{
-			this.options.top=center_y-this.options.height/2;
-		}
-		if(!this.options.left)
-		{
-			this.options.left=center_x-this.options.width/2;
-		}
-	},
-	update: function(){
-		if (!this._map) { return; }
-		console.log("update")
-		this._setDefaultDim();
-		var center=this._map.getCenter();
-		var dx=this._latlng.lng-center.lng;
-		var dy=this._latlng.lat-center.lat;
-		this.options.angle=Math.atan2(dy,dx) * 180.0 / Math.PI;
-		console.log(this.options.angle)
-		this._divcontent.innerHTML=this._content;
-		var hypotenus=this._getLineLengthInRect(this.options.angle,this.options.width,this.options.height);
+			
+			this._anchor_center={
+				x: _anchor_arrow.x-  (Math.cos(rad)*delta) ,
+				y: _anchor_arrow.y + (Math.sin(rad)*delta) ,
+			};
+				
+				
+			
+			this.options.top=this._anchor_center.y-(this.options.height/2);
+			this.options.left=this._anchor_center.x-(this.options.width/2);
+			this._div.style.top=this.options.top+"px";
+			this._div.style.left=this.options.left+"px";
+			return;
+			if(this.options.autoPlacement)
+			{
+				
+				var center_x=this._container.clientWidth/2;
+				var center_y=this._container.clientHeight/2;
+				var alpha_trigger=Math.atan2(this._container.clientHeight,this._container.clientWidth) * 180.0 / Math.PI;
+				var phase=(this.options.angle+360)%360;
+				console.log("_update_autoplacement",phase,alpha_trigger)
+				switch(true)
+				{
+					case phase >=-phase <(alpha_trigger+270) && phase <alpha_trigger:
+					this.options.top=center_y-this.options.height/2;
+					this.options.left=center_x-(this.options.width/2) +(this.options.strenth/2); 
+					console.log("Est")
 
-		var rad=this._deg2rad(this.options.angle%360 );
+					break;
+					case phase >=alpha_trigger && phase <(alpha_trigger+90):
+					this.options.top=center_y-this.options.height/2-(this.options.strenth/2);
+					this.options.left=center_x-(this.options.width/2) ; 
+					console.log("Nord")
+					break;
+					case phase >=phase <(alpha_trigger+90) && phase  <(alpha_trigger+180):
+					this.options.top=center_y-this.options.height/2;
+					this.options.left=center_x-(this.options.width/2) -(this.options.strenth/2); 
+					console.log("Ouest")
+					break;
+					case phase >=phase <(alpha_trigger+180) && phase  <(alpha_trigger+270):
+					this.options.top= this._container.clientHeight -this.options.height-(this.options.strenth/2);
+					this.options.left=center_x-(this.options.width/2) ; 
+					console.log("Sud")
+					break;
+				}
+			}
+			this._div.style.top=this.options.top+"px";
+			this._div.style.left=this.options.left+"px";
+		},
+		_update_cursor: function(){
+			var center=this._map.getCenter();
+			if(this._anchor_center){
+				var  _anchor_center_point = L.point(this._anchor_center.x, this._anchor_center.y);
+				center=this._map.containerPointToLatLng(_anchor_center_point);
+			}
+			var dx=this._latlng.lng-center.lng;
+			var dy=this._latlng.lat-center.lat;
+			this.options.angle=Math.atan2(dy,dx) * 180.0 / Math.PI;
+			var hypotenus=this._getLineLengthInRect(this.options.angle,this.options.width,this.options.height);
 
-		this._div.style.height=this.options.height+"px";
-		this._div.style.background=this.options.borderColor;
-		this._div.style.width=this.options.width+"px";
-		this._div.style.top=this.options.top+"px";
-		this._div.style.zIndex=10000;
-		this._div.style.left=this.options.left+"px";
-		this._div.style.borderRadius=this.options.borderRadius+"px";
-		this._div.style.position="absolute";
+			var rad=this._deg2rad(this.options.angle%360 );
+			var x=(Math.cos(-rad)*(hypotenus))+(this.options.width/2);
+			var y=(Math.sin(-rad)*(hypotenus))+(this.options.height/2)
+			var point = L.point(x+this.options.left, y+this.options.top);
+			this._offsetCenter=this._map.containerPointToLatLng(point);
 
-		var x=(Math.cos(-rad)*(hypotenus))+(this.options.width/2);
-		var y=(Math.sin(-rad)*(hypotenus))+(this.options.height/2)
-		var point = L.point(x+this.options.left, y+this.options.top);
-		this._offsetCenter=this._map.containerPointToLatLng(point);
+			this._curs.style.position="absolute";
+			this._curs.style.top=y +"px";
+			this._curs.style.left=x + "px";
 
-		var dx=this._latlng.lng-this._offsetCenter.lng;
-		var dy=this._latlng.lat-this._offsetCenter.lat;
-		this.options.angle=Math.atan2(dy,dx) * 180.0 / Math.PI;
 
-		if((this.options.angle%360) - this.options.lastAngle > 180		)
-			this.turn--;
-		if( this.options.lastAngle - (this.options.angle%360) > 180		)
-			this.turn++;
+		},
+		_update_arrow: function() {
+			var dx=this._latlng.lng-this._offsetCenter.lng;
+			var dy=this._latlng.lat-this._offsetCenter.lat;
+			this.options.angle=Math.atan2(dy,dx) * 180.0 / Math.PI;
 
-		//console.log(this.options.angle,this.options.lastAngle,this.turn,(this.turn*360)+this.options.angle )
-		this.options.lastAngle=this.options.angle;
-		this.options.angle=(this.turn*360)+this.options.angle;
+			if((this.options.angle%360) - this.options.lastAngle > 180		)
+				this.turn--;
+			if( this.options.lastAngle - (this.options.angle%360) > 180		)
+				this.turn++;
 
-		this._curs.style.position="absolute";
-		this._curs.style.top=y +"px";
-		this._curs.style.left=x + "px";
-		this._curs.style.transform= "rotate("+(this.options.angle*-1)+"deg) ";
 
+			this.options.lastAngle=this.options.angle;
+			this.options.angle=(this.turn*360)+this.options.angle;
+			this._curs.style.transform= "rotate("+(this.options.angle*-1)+"deg) ";
+		},
 		
-		this._arrow.style.position="absolute";
-		this._arrow.style.border= this.options.base+"px solid transparent"
-		this._arrow.style.borderRight= "none";
-		this._arrow.style.borderLeft= (this.options.strenth)+"px solid "+this.options.borderColor;
-		this._arrow.style.transform= "translate(-"+this.options.base+"px,-50%)";
-		this._arrow.style.borderBottomLeftRadius=this.options.base+"px";
-		this._arrow.style.borderTopLeftRadius=this.options.base+"px";
-		
+		update: function(){
+			if (!this._map) { return; }
 
-		this._arrow_back.style.position="absolute";
-		this._arrow_back.style.border= this.options.base+"px solid transparent";
-		this._arrow_back.style.borderRight= "none";
-		this._arrow_back.style.borderLeft= (this.options.strenth)+"px solid "+this.options.background;
-		var offset=(this.options.borderThick*5);
-		this._arrow_back.style.transform= "translate("+(-(this.options.strenth)-offset)+"px,-"+this.options.base+"px)";
-		this._arrow_back.style.borderBottomLeftRadius=this.options.base+"px";
-		this._arrow_back.style.borderTopLeftRadius=this.options.base+"px";
+			console.log("speechbubble update")
+			this._setDefaultDim();
 
-		this._divcontent.style.position="absolute";
-		this._divcontent.style.top=this.options.borderThick+"px";
-		this._divcontent.style.left=this.options.borderThick+"px";
-		this._divcontent.style.right=this.options.borderThick+"px";
-		this._divcontent.style.bottom=this.options.borderThick+"px";
-		this._divcontent.style.background=this.options.background;
-		this._divcontent.style.borderRadius=(this.options.borderRadius-this.options.borderThick)+"px";
+			this._divcontent.innerHTML=this._content;
+
+			this._update_autoplacement();
+			this._update_cursor();
+			this._update_arrow();
+
+			if(!this._firstUpdate)
+			{
+
+				
+				
+				
+				
+				
+				
+    
+				this._div.style.height=this.options.height+"px";
+				this._div.style.background=this.options.borderColor;
+				this._div.style.width=this.options.width+"px";
+				this._div.style.zIndex=10000;
+				this._div.style.borderRadius=this.options.borderRadius+"px";
+				this._div.style.position="absolute";
+				this._arrow.style.position="absolute";
+				this._arrow.style.border= this.options.base+"px solid transparent"
+				this._arrow.style.borderRight= "none";
+				this._arrow.style.borderLeft= (this.options.strenth)+"px solid "+this.options.borderColor;
+				this._arrow.style.transform= "translate(-"+(this.options.base*3)+"px,-50%)";
+				this._arrow.style.borderBottomLeftRadius=this.options.base+"px";
+				this._arrow.style.borderTopLeftRadius=this.options.base+"px";
+
+
+				this._arrow_back.style.position="absolute";
+				this._arrow_back.style.border= this.options.base+"px solid transparent";
+				this._arrow_back.style.borderRight= "none";
+				this._arrow_back.style.borderLeft= (this.options.strenth)+"px solid "+this.options.background;
+				var offset=(this.options.borderThick*5);
+				this._arrow_back.style.transform= "translate("+(-(this.options.strenth)-offset)+"px,-"+this.options.base+"px)";
+				this._arrow_back.style.borderBottomLeftRadius=this.options.base+"px";
+				this._arrow_back.style.borderTopLeftRadius=this.options.base+"px";
+
+				this._divcontent.style.position="absolute";
+				this._divcontent.style.top=this.options.borderThick+"px";
+				this._divcontent.style.left=this.options.borderThick+"px";
+				this._divcontent.style.right=this.options.borderThick+"px";
+				this._divcontent.style.bottom=this.options.borderThick+"px";
+				this._divcontent.style.background=this.options.background;
+				this._divcontent.style.borderRadius=(this.options.borderRadius-this.options.borderThick)+"px";
+				this._firstUpdate=true;
+			}
+
+
+
+
+
+
+
+
+
+
+
+
+
 		//this._arrow.style.transformOrigin= "translate(-50%,-50%)";
 		
 
@@ -201,6 +321,7 @@ L.SpeechBubble = L.DivOverlay.extend({
 		this.onRemove(this._map, keepMapInteractionsOff);
 		return this;
 	},
+
 	onAdd: function (map) {
 		this._map = map;
 		this._container=map.getContainer();
@@ -208,15 +329,16 @@ L.SpeechBubble = L.DivOverlay.extend({
 		
 		
 		
-		map._speechbubble = this;
 		
-		map.on("move ",function() { 
-			this._speechbubble.update(); 
-		});
-		map.on("zoom ",function() { 
-			this._speechbubble.update(); 
-		});
-		map._speechbubble.update();
+		map._speechbubble = this;
+			if(this._speechbubble && typeof(this._speechbubble.update))
+		{
+		map.on("move ",this._speechbubble.update);
+			
+		}
+		
+		if(typeof(map._speechbubble.update)=="function")
+				map._speechbubble.update();
 		
 	},
 	addTo: function (map) {
@@ -226,11 +348,23 @@ L.SpeechBubble = L.DivOverlay.extend({
 	onRemove: function (map, keepMapInteractionsOff) {
 		if(this.timer) clearInterval(this.timer);
 		map.getContainer().removeChild(this._div);
+		
 
 		
 		
 		this._map = null;
 	},
+	_animateZoom: function(e){
+			console.log("_animateZoom");
+	},
+	_adjustPan: function(e){
+			console.log("_adjustPan");
+
+	},
+	getEvents: function () {
+			return {};
+	},
+	
 	_setStrenth: function(strenth)
 	{
 		this.options.strenth=strenth;
@@ -271,6 +405,8 @@ L.SpeechBubble = L.DivOverlay.extend({
 
 L.Layer.include({
 	bindSpeechBubble: function (content, options) {
+		console.log("bindSpeechBubble")
+
 		if (content instanceof L.SpeechBubble) {
 			setOptions(content, options);
 			this._speechbubble = content;
@@ -281,9 +417,30 @@ L.Layer.include({
 			}
 			this._speechbubble.setContent(content);
 		}
+		
+
+		return this;
+	},
+
+	speechBubbleMove: function (e) {
+		console.log("speechBubbleMove")
+		if (this._speechbubble)
+			this._speechbubble.update();
+	},
+	unbindSpeechBubble: function () {
+		console.log("unbindSpeechBubble")
+		if (this._speechbubble) {
+			this.off({
+				//zoom: this._speechbubble.update,
+				move: this._speechbubble.update
+			});
+			this._speechbubbleHandlersAdded = false;
+			this._speechbubble = null;
+		}
 		return this;
 	},
 	openSpeechBubble: function (layer, latlng) {
+		console.log("openSpeechBubble")
 		if (!(layer instanceof L.Layer)) {
 			latlng = layer;
 			layer = this;
@@ -309,6 +466,14 @@ L.Layer.include({
 
 			// open the popup on the map
 			this._map.openSpeechBubble(this._speechbubble, latlng);
+			if (!this._speechbubbleHandlersAdded) {
+			this._map.on({
+				
+				zoom: this.speechBubbleMove,
+				move: this.speechBubbleMove
+			});
+			this._speechbubbleHandlersAdded = true;
+		}
 		}
 
 		return this;
@@ -323,6 +488,12 @@ L.Map.include({
 	// @method openPopup(content: String|HTMLElement, latlng: LatLng, options?: Popup options): this
 	// Creates a popup with the specified content and options and opens it in the given point on a map.
 	openSpeechBubble: function (speechbubble, latlng, options) {
+		console.log("openSpeechBubble (map)")
+		if(typeof(this._speechbubble)!="undefined" && this._speechbubble)
+		{
+			this.closeSpeechBubble(this._speechbubble);
+		}
+
 		if (!(speechbubble instanceof L.SpeechBubble)) {
 			speechbubble = new L.SpeechBubble(options).setContent(speechbubble);
 		}
@@ -335,7 +506,6 @@ L.Map.include({
 			return this;
 		}
 
-
 		this._speechbubble = speechbubble;
 		this._speechbubble.update();
 		return this.addLayer(speechbubble);
@@ -344,6 +514,7 @@ L.Map.include({
 	// @method closePopup(popup?: Popup): this
 	// Closes the popup previously opened with [openPopup](#map-openpopup) (or the given one).
 	closeSpeechBubble: function (speechbubble) {
+		console.log("closeSpeechBubble (map)")
 		if (!speechbubble || speechbubble === this._speechbubble) {
 			speechbubble = this._speechbubble;
 			this._speechbubble = null;
@@ -355,5 +526,5 @@ L.Map.include({
 	}
 });
 
- return L.SpeechBubble;
+return L.SpeechBubble;
 }, window));
