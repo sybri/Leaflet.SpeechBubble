@@ -425,7 +425,17 @@ L.Layer.include({
 	speechBubbleMove: function (e) {
 		console.log("speechBubbleMove")
 		if (this._speechbubble)
-			this._speechbubble.update();
+		{
+			var bound=this._speechbubble._map.getBounds()
+			if (bound.contains(this._speechbubble.getLatLng()))
+			{
+				this._speechbubble._map.closeSpeechBubble();
+			}
+			else
+			{
+					this._speechbubble.update();
+			}
+		}
 	},
 	unbindSpeechBubble: function () {
 		console.log("unbindSpeechBubble")
