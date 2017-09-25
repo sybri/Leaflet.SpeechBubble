@@ -177,29 +177,29 @@
 				var center_y=this._container.clientHeight/2;
 				var alpha_trigger=Math.atan2(this._container.clientHeight,this._container.clientWidth) * 180.0 / Math.PI;
 				var phase=(this.options.angle+360)%360;
-				console.log("_update_autoplacement",phase,alpha_trigger)
+				//console.log("_update_autoplacement",phase,alpha_trigger)
 				switch(true)
 				{
 					case phase >=-phase <(alpha_trigger+270) && phase <alpha_trigger:
 					this.options.top=center_y-this.options.height/2;
 					this.options.left=center_x-(this.options.width/2) +(this.options.strenth/2); 
-					console.log("Est")
+					//console.log("Est")
 
 					break;
 					case phase >=alpha_trigger && phase <(alpha_trigger+90):
 					this.options.top=center_y-this.options.height/2-(this.options.strenth/2);
 					this.options.left=center_x-(this.options.width/2) ; 
-					console.log("Nord")
+					//console.log("Nord")
 					break;
 					case phase >=phase <(alpha_trigger+90) && phase  <(alpha_trigger+180):
 					this.options.top=center_y-this.options.height/2;
 					this.options.left=center_x-(this.options.width/2) -(this.options.strenth/2); 
-					console.log("Ouest")
+					//console.log("Ouest")
 					break;
 					case phase >=phase <(alpha_trigger+180) && phase  <(alpha_trigger+270):
 					this.options.top= this._container.clientHeight -this.options.height-(this.options.strenth/2);
 					this.options.left=center_x-(this.options.width/2) ; 
-					console.log("Sud")
+					//console.log("Sud")
 					break;
 				}
 			}
@@ -248,7 +248,7 @@
 		update: function(){
 			if (!this._map) { return; }
 
-			console.log("speechbubble update")
+			//console.log("speechbubble update")
 			this._setDefaultDim();
 
 			this._divcontent.innerHTML=this._content;
@@ -355,10 +355,10 @@
 		this._map = null;
 	},
 	_animateZoom: function(e){
-			console.log("_animateZoom");
+			//console.log("_animateZoom");
 	},
 	_adjustPan: function(e){
-			console.log("_adjustPan");
+			//console.log("_adjustPan");
 
 	},
 	getEvents: function () {
@@ -405,7 +405,7 @@
 
 L.Layer.include({
 	bindSpeechBubble: function (content, options) {
-		console.log("bindSpeechBubble")
+		//console.log("bindSpeechBubble")
 
 		if (content instanceof L.SpeechBubble) {
 			setOptions(content, options);
@@ -423,7 +423,7 @@ L.Layer.include({
 	},
 
 	speechBubbleMove: function (e) {
-		console.log("speechBubbleMove")
+		//console.log("speechBubbleMove")
 		if (this._speechbubble)
 		{
 			var bound=this._speechbubble._map.getBounds()
@@ -438,7 +438,7 @@ L.Layer.include({
 		}
 	},
 	unbindSpeechBubble: function () {
-		console.log("unbindSpeechBubble")
+		//console.log("unbindSpeechBubble")
 		if (this._speechbubble) {
 			this.off({
 				//zoom: this._speechbubble.update,
@@ -450,7 +450,7 @@ L.Layer.include({
 		return this;
 	},
 	openSpeechBubble: function (layer, latlng) {
-		console.log("openSpeechBubble")
+		//console.log("openSpeechBubble")
 		if (!(layer instanceof L.Layer)) {
 			latlng = layer;
 			layer = this;
@@ -498,7 +498,7 @@ L.Map.include({
 	// @method openPopup(content: String|HTMLElement, latlng: LatLng, options?: Popup options): this
 	// Creates a popup with the specified content and options and opens it in the given point on a map.
 	openSpeechBubble: function (speechbubble, latlng, options) {
-		console.log("openSpeechBubble (map)")
+		//console.log("openSpeechBubble (map)")
 		if(typeof(this._speechbubble)!="undefined" && this._speechbubble)
 		{
 			this.closeSpeechBubble(this._speechbubble);
@@ -524,7 +524,7 @@ L.Map.include({
 	// @method closePopup(popup?: Popup): this
 	// Closes the popup previously opened with [openPopup](#map-openpopup) (or the given one).
 	closeSpeechBubble: function (speechbubble) {
-		console.log("closeSpeechBubble (map)")
+		//console.log("closeSpeechBubble (map)")
 		if (!speechbubble || speechbubble === this._speechbubble) {
 			speechbubble = this._speechbubble;
 			this._speechbubble = null;
