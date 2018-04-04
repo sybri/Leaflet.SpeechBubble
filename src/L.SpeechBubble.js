@@ -424,6 +424,8 @@ L.Layer.include({
 
 	speechBubbleMove: function (e) {
 		//console.log("speechBubbleMove")
+		if(typeof(e.pinch)!="undefined" && e.pinch===true)
+			return e;
 		if (this._speechbubble)
 		{
 			var bound=this._speechbubble._map.getBounds()
